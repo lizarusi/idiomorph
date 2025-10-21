@@ -7,7 +7,7 @@
   let match = using.match(/v(\d+\.\d+\.\d+)/);
   let path;
   if (match) {
-    path = `https://www.unpkg.com/idiomorph@${match[1]}/dist/idiomorph.min.js`;
+    path = `https://www.unpkg.com/idiomorph@${match[1]}/dist/idiomorph.js`;
   } else if (using === "idiomorph") {
     path = "/src/idiomorph.js";
   } else {
