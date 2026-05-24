@@ -234,7 +234,13 @@ var Idiomorph = (function () {
       activeElement?.focus();
     }
     if (activeElement && !activeElement.selectionEnd && selectionEnd) {
-      activeElement.setSelectionRange(selectionStart, selectionEnd);
+      try {
+        activeElement.setSelectionRange(selectionStart, selectionEnd);
+      } catch {
+        // the element may not support setSelectionRange: it's no longer an
+        // input/textarea after the morph, or it's an input type (number,
+        // email, date, ...) that doesn't support text selection
+      }
     }
 
     return results;
