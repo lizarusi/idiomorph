@@ -121,6 +121,28 @@ describe("Core morphing tests", function () {
     );
   });
 
+  it("morphs outerHTML properly when oldNode is a text node", function () {
+    let parent = make("<div>Foo</div>");
+    let initial = parent.firstChild;
+    Idiomorph.morph(initial, "<button>Bar</button>", {
+      morphStyle: "outerHTML",
+    });
+    parent.innerHTML.should.equal("<button>Bar</button>");
+  });
+
+  it("morphs outerHTML properly when oldNode is a comment node", function () {
+    let parent = make(
+      "<div><p>Before</p><!-- placeholder --><p>After</p></div>",
+    );
+    let initial = parent.childNodes[1];
+    Idiomorph.morph(initial, "<button>Bar</button>", {
+      morphStyle: "outerHTML",
+    });
+    parent.innerHTML.should.equal(
+      "<p>Before</p><button>Bar</button><p>After</p>",
+    );
+  });
+
   it("morphs innerHTML as content properly when argument is null", function () {
     let initial = make("<div>Foo</div>");
     Idiomorph.morph(initial, null, { morphStyle: "innerHTML" });
