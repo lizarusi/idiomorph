@@ -1104,7 +1104,8 @@ var Idiomorph = (function () {
     function findIdElements(root) {
       /** @type {IdElement[]} */
       let elements = [];
-      for (const elt of root.querySelectorAll("[id]")) {
+      // root could be a text or comment node which doesn't have `querySelectorAll`
+      for (const elt of root.querySelectorAll?.("[id]") ?? []) {
         // elt.id is unsafe because of form input shadowing, and `id=""` is not persistable
         const id = elt.getAttribute("id");
         if (id) elements.push({ elt, id });
