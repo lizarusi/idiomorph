@@ -312,6 +312,26 @@ describe("Option to forcibly restore focus after morph", function () {
       assertNoFocus();
     });
 
+    it("restores focus to an id containing selector syntax", function () {
+      getWorkArea().innerHTML = `
+        <div>
+          <input type="text" id="a\\b" value="abc">
+        </div>`;
+      setFocusAndSelection("a\\b", "b");
+
+      // the tag change means the element is rebuilt, so focus has to be restored by id
+      Idiomorph.morph(
+        getWorkArea(),
+        `
+        <div>
+          <textarea id="a\\b">abc</textarea>
+        </div>`,
+        { morphStyle: "innerHTML" },
+      );
+
+      assertFocus("a\\b");
+    });
+
     it("does not throw for input types that reject setSelectionRange", function () {
       getWorkArea().innerHTML = `
         <div>

@@ -192,6 +192,13 @@ describe("Core morphing tests", function () {
     initial.outerHTML.should.equal(final);
   });
 
+  it("can handle ids containing selector syntax", function () {
+    let initial = make(`<div><hr id='a"b\\c'></div>`);
+    let hr = initial.querySelector("hr");
+    Idiomorph.morph(initial, `<div><div><hr id='a"b\\c'></div></div>`);
+    initial.querySelector("hr").should.equal(hr);
+  });
+
   it("ignores active element when ignoreActive set to true", function () {
     let initialSource = "<div><div id='d1'>Foo</div><input id='i1'></div>";
     getWorkArea().innerHTML = initialSource;

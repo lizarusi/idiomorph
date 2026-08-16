@@ -230,7 +230,9 @@ var Idiomorph = (function () {
       activeElementId &&
       activeElementId !== document.activeElement?.getAttribute("id")
     ) {
-      activeElement = ctx.target.querySelector(`[id="${activeElementId}"]`);
+      activeElement = ctx.target.querySelector(
+        `[id="${CSS.escape(activeElementId)}"]`,
+      );
       activeElement?.focus();
     }
     if (activeElement && !activeElement.selectionEnd && selectionEnd) {
@@ -556,14 +558,15 @@ var Idiomorph = (function () {
      * @returns {Element} The found element
      */
     function moveBeforeById(parentNode, id, after, ctx) {
+      const selector = `[id="${CSS.escape(id)}"]`;
       const target =
         /** @type {Element} - will always be found */
         (
           // ctx.target.id unsafe because of form input shadowing
           // ctx.target could be a document fragment which doesn't have `getAttribute`
           (ctx.target.getAttribute?.("id") === id && ctx.target) ||
-            ctx.target.querySelector(`[id="${id}"]`) ||
-            ctx.pantry.querySelector(`[id="${id}"]`)
+            ctx.target.querySelector(selector) ||
+            ctx.pantry.querySelector(selector)
         );
       removeElementFromAncestorsIdMaps(target, ctx);
       moveBefore(parentNode, target, after);
