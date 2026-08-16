@@ -206,6 +206,17 @@ describe("Core morphing tests", function () {
     initial.outerHTML.should.equal(finalSrc);
   });
 
+  it("can morph a form whose controls shadow element properties", function () {
+    getWorkArea().innerHTML = `<div id="left"><form id="f"><input name="id"></form></div><div id="right"></div>`;
+    let form = getWorkArea().querySelector("form");
+    Idiomorph.morph(
+      getWorkArea(),
+      `<div id="left"></div><div id="right"><form id="f"><input name="id"></form></div>`,
+      { morphStyle: "innerHTML" },
+    );
+    getWorkArea().querySelector("form").should.equal(form);
+  });
+
   it("ignores active element when ignoreActive set to true", function () {
     let initialSource = "<div><div id='d1'>Foo</div><input id='i1'></div>";
     getWorkArea().innerHTML = initialSource;
@@ -691,6 +702,18 @@ describe("Core morphing tests", function () {
       );
       Idiomorph.morph(initial, "<div><p id='a'>Foo</p><p id='b'>Baz</p></div>");
       warn.firstCall.args[1].should.eql(["a", "b"]);
+    });
+
+    it("warns when duplicate ids are on forms whose controls shadow id", function () {
+      let initial = make(
+        "<div><form id='a'><input name='id'></form><form id='a'><input name='id'></form></div>",
+      );
+      Idiomorph.morph(
+        initial,
+        "<div><form id='a'><input name='id'></form></div>",
+      );
+      warn.calledOnce.should.equal(true);
+      warn.firstCall.args[1].should.eql(["a"]);
     });
 
     it("does not warn when all ids are unique", function () {

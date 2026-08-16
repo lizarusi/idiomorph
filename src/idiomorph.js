@@ -1176,22 +1176,25 @@ var Idiomorph = (function () {
 
       /** @type {Map<string, string>} */
       let oldIdTagNameMap = new Map();
-      for (const { id, tagName } of oldIdElements) {
+      for (const elt of oldIdElements) {
+        // elt.id is unsafe because of form input shadowing
+        const id = elt.getAttribute("id");
         // elements with `id=""` are not persistable
         if (!id) continue;
         if (oldIdTagNameMap.has(id)) {
           duplicateIds.add(id);
         } else {
-          oldIdTagNameMap.set(id, tagName);
+          oldIdTagNameMap.set(id, elt.tagName);
         }
       }
 
       let persistentIds = new Set();
-      for (const { id, tagName } of newIdElements) {
+      for (const elt of newIdElements) {
+        const id = elt.getAttribute("id");
         if (!id) continue;
         if (persistentIds.has(id)) {
           duplicateIds.add(id);
-        } else if (oldIdTagNameMap.get(id) === tagName) {
+        } else if (oldIdTagNameMap.get(id) === elt.tagName) {
           persistentIds.add(id);
         }
         // skip if tag types mismatch because its not possible to morph one tag into another
