@@ -688,7 +688,10 @@ var Idiomorph = (function () {
           if (ignoreAttribute(newAttribute.name, oldElt, "update", ctx)) {
             continue;
           }
-          oldElt.setAttribute(newAttribute.name, newAttribute.value);
+          // setAttribute drops namespaces and rejects names like `@click`
+          oldElt.setAttributeNode(
+            /** @type {Attr} */ (newAttribute.cloneNode()),
+          );
         }
         // iterate backwards to avoid skipping over items when a delete occurs
         for (let i = oldAttributes.length - 1; 0 <= i; i--) {

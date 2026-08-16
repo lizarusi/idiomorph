@@ -330,6 +330,26 @@ describe("Core morphing tests", function () {
     document.body.removeChild(parent);
   });
 
+  it("preserves the namespace of an added namespaced attribute", function () {
+    let initial = make("<svg><use></use></svg>");
+
+    Idiomorph.morph(initial, '<svg><use xlink:href="#foo"></use></svg>');
+
+    initial
+      .querySelector("use")
+      .getAttributeNS("http://www.w3.org/1999/xlink", "href")
+      .should.equal("#foo");
+  });
+
+  it("morphs attribute names that the parser accepts but setAttribute rejects", function () {
+    let initial = make('<div @click="a"></div>');
+
+    Idiomorph.morph(initial, '<div @click="b" @change="c"></div>');
+
+    initial.getAttribute("@click").should.equal("b");
+    initial.getAttribute("@change").should.equal("c");
+  });
+
   it("can prevent element addition w/ the beforeNodeAdded callback", function () {
     let parent = make("<div><p>1</p><p>2</p></div>");
     document.body.append(parent);
