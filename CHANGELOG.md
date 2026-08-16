@@ -9,6 +9,10 @@
 * Added:
   * Warn in the console when duplicate ids are detected during a morph, since they can cause subtle state loss (@botandrose) #142
 
+* Fixed:
+  * Fix TypeError when restoring focus to an element that doesn't support text selection (@emaia) #150
+  * Skip the `beforeAttributeUpdated` callback when an attribute's value is unchanged (@monorkin) #149
+
 ## [0.7.4] - 2025-09-29
 
 * Fixed:
