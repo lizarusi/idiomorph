@@ -199,6 +199,13 @@ describe("Core morphing tests", function () {
     initial.querySelector("hr").should.equal(hr);
   });
 
+  it("can handle empty ids", function () {
+    let initial = make(`<div><span id="">Foo</span><hr id="a"></div>`);
+    let finalSrc = `<div><hr id="a"><span id="">Bar</span></div>`;
+    Idiomorph.morph(initial, finalSrc);
+    initial.outerHTML.should.equal(finalSrc);
+  });
+
   it("ignores active element when ignoreActive set to true", function () {
     let initialSource = "<div><div id='d1'>Foo</div><input id='i1'></div>";
     getWorkArea().innerHTML = initialSource;

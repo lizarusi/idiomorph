@@ -1177,6 +1177,8 @@ var Idiomorph = (function () {
       /** @type {Map<string, string>} */
       let oldIdTagNameMap = new Map();
       for (const { id, tagName } of oldIdElements) {
+        // elements with `id=""` are not persistable
+        if (!id) continue;
         if (oldIdTagNameMap.has(id)) {
           duplicateIds.add(id);
         } else {
@@ -1186,6 +1188,7 @@ var Idiomorph = (function () {
 
       let persistentIds = new Set();
       for (const { id, tagName } of newIdElements) {
+        if (!id) continue;
         if (persistentIds.has(id)) {
           duplicateIds.add(id);
         } else if (oldIdTagNameMap.get(id) === tagName) {
