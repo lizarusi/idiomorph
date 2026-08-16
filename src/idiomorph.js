@@ -87,7 +87,7 @@
 /**
  * @callback Morph
  *
- * @param {Element | Document} oldNode
+ * @param {Node} oldNode
  * @param {Node | HTMLCollection | Node[] | string | null} newContent
  * @param {Config} [config]
  * @returns {Promise<Node[]> | Node[]}
@@ -152,27 +152,27 @@ var Idiomorph = (function () {
   /**
    * Core idiomorph function for morphing one DOM tree to another
    *
-   * @param {Element | Document} oldNode
+   * @param {Node} oldNode
    * @param {Node | HTMLCollection | Node[] | string | null} newContent
    * @param {Config} [config]
    * @returns {Promise<Node[]> | Node[]}
    */
   function morph(oldNode, newContent, config = {}) {
-    oldNode = normalizeElement(oldNode);
+    const oldElt = normalizeElement(oldNode);
     const newNode = normalizeParent(newContent);
-    const ctx = createMorphContext(oldNode, newNode, config);
+    const ctx = createMorphContext(oldElt, newNode, config);
 
     return withHeadBlocking(
       ctx,
-      oldNode,
+      oldElt,
       newNode,
       /** @param {MorphContext} ctx */ (ctx) => {
         const morphedNodes = saveAndRestoreFocus(ctx, () => {
           if (ctx.morphStyle === "innerHTML") {
-            morphChildren(ctx, oldNode, newNode);
-            return Array.from(oldNode.childNodes);
+            morphChildren(ctx, oldElt, newNode);
+            return Array.from(oldElt.childNodes);
           } else {
-            return morphOuterHTML(ctx, oldNode, newNode);
+            return morphOuterHTML(ctx, oldElt, newNode);
           }
         });
         ctx.pantry.remove();
@@ -1018,6 +1018,10 @@ var Idiomorph = (function () {
       if (!["innerHTML", "outerHTML"].includes(morphStyle)) {
         throw `Do not understand how to morph style ${morphStyle}`;
       }
+      // Text and Comment have no ParentNode methods, so they cannot take innerHTML
+      if (morphStyle === "innerHTML" && !oldNode.append) {
+        throw `Cannot morph the innerHTML of a ${oldNode.nodeName} node, as it cannot have children`;
+      }
 
       const headStyle = mergedConfig.head.style || "merge";
       if (!["merge", "append", "morph", "none"].includes(headStyle)) {
@@ -1095,24 +1099,26 @@ var Idiomorph = (function () {
     }
 
     /**
-     * Returns all elements with a non-empty ID contained within the root element and its
+     * Returns all elements with a non-empty ID contained within the root node and its
      * descendants, each paired with its id so that it only has to be read once.
      *
-     * @param {Element} root
+     * @param {Node} root
      * @returns {IdElement[]}
      */
     function findIdElements(root) {
       /** @type {IdElement[]} */
       let elements = [];
-      // root could be a text or comment node which doesn't have `querySelectorAll`
-      for (const elt of root.querySelectorAll?.("[id]") ?? []) {
+      // root could be a text or comment node which has no `querySelectorAll`,
+      // or a document fragment which has no `getAttribute`
+      const rootElt = /** @type {Partial<Element>} */ (root);
+      for (const elt of rootElt.querySelectorAll?.("[id]") ?? []) {
         // elt.id is unsafe because of form input shadowing, and `id=""` is not persistable
         const id = elt.getAttribute("id");
         if (id) elements.push({ elt, id });
       }
-      // root could be a document fragment which doesn't have `getAttribute`
-      const rootId = root.getAttribute?.("id");
-      if (rootId) elements.push({ elt: root, id: rootId });
+      const rootId = rootElt.getAttribute?.("id");
+      if (rootId)
+        elements.push({ elt: /** @type {Element} */ (root), id: rootId });
       return elements;
     }
 
@@ -1231,14 +1237,15 @@ var Idiomorph = (function () {
 
     /**
      *
-     * @param {Element | Document} content
+     * @param {Node} content
      * @returns {Element}
      */
     function normalizeElement(content) {
       if (content instanceof Document) {
         return content.documentElement;
       } else {
-        return content;
+        // a Text or Comment node is not an Element, but morphOuterHTML only ever reads Node members off it
+        return /** @type {Element} */ (content);
       }
     }
 
