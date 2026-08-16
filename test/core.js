@@ -200,6 +200,14 @@ describe("Core morphing tests", function () {
     }).should.throw("Do not understand how to morph style magic");
   });
 
+  it("errors on innerHTML of a node that cannot have children", function () {
+    (() => {
+      Idiomorph.morph(make("<div>Foo</div>").firstChild, [], {
+        morphStyle: "innerHTML",
+      });
+    }).should.throw("Cannot morph the innerHTML of a #text node");
+  });
+
   it("errors on bad head style", function () {
     (() => {
       Idiomorph.morph(make("<p>"), [], { head: { style: "magic" } });
