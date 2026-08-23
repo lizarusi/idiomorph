@@ -39,7 +39,7 @@
     "test:all": "web-test-runner --concurrency 1 --playwright --browsers chromium firefox webkit",
     "test:ci": "npm run typecheck && npm run format:check && npm run test:all -- --fail-only && node test/lib/ensure-full-coverage.js",
     "test:coverage": "npm run test:chrome && node test/lib/ensure-full-coverage.js",
-    "perf": "node perf/runner.js",
+    "perf": "playwright install chromium && node perf/runner.js",
 
     "dist": "cp -r src/* dist/ && npm run-script ext && npm run-script esm && npm run-script types && npm run-script uglify && npm run-script gzip && exit",
     "ext": "cat src/idiomorph.js src/idiomorph-htmx.js > dist/idiomorph-ext.js",
@@ -66,6 +66,7 @@
     "htmx.org": "1.9.9",
     "lcov-parse": "^1.0.0",
     "mocha": "^11.0.1",
+    "playwright": "^1.62.1",
     "prettier": "^3.4.2",
     "sinon": "^9.2.4",
     "tachometer": "^0.7.1",

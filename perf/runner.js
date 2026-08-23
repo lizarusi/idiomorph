@@ -1,4 +1,5 @@
 const { spawnSync } = require("child_process");
+const { chromium } = require("playwright");
 const fs = require("fs");
 const path = require("path");
 
@@ -18,6 +19,13 @@ if (benchmarks.length === 0) {
     .filter((name, i, self) => i === self.indexOf(name)); // Remove duplicates
 }
 
+const browser = {
+  name: "chrome",
+  headless: true,
+  binary: chromium.executablePath(),
+  addArguments: ["--no-sandbox"], // playwright's chromium ships without the setuid sandbox helper
+};
+
 benchmarks.forEach((benchmark) => {
   const config = {
     root: "..",
@@ -25,12 +33,12 @@ benchmarks.forEach((benchmark) => {
       {
         name: `${benchmark}: ${versus}`,
         url: `../perf/runner.html?using=${versus}&benchmark=${benchmark}`,
-        browser: "chrome-headless",
+        browser,
       },
       {
         name: `${benchmark}: src/idiomorph.js`,
         url: `../perf/runner.html?using=idiomorph&benchmark=${benchmark}`,
-        browser: "chrome-headless",
+        browser,
       },
     ],
   };
