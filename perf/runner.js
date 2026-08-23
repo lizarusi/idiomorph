@@ -6,7 +6,11 @@ const path = require("path");
 let benchmarks = process.argv.slice(2);
 let versus;
 
-if (benchmarks[0] === "morphdom" || /^v[\d.]+$/.test(benchmarks[0])) {
+if (
+  benchmarks[0] === "morphdom" ||
+  /^v[\d.]+$/.test(benchmarks[0]) ||
+  /\.js$/.test(benchmarks[0])
+) {
   versus = benchmarks.shift();
 } else {
   versus = "morphdom";

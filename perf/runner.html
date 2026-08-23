@@ -6,7 +6,9 @@
   let using = params.get("using");
   let match = using.match(/v(\d+\.\d+\.\d+)/);
   let path;
-  if (match) {
+  if (using.endsWith(".js")) {
+    path = `/${using}`;
+  } else if (match) {
     path = `https://www.unpkg.com/idiomorph@${match[1]}/dist/idiomorph.js`;
   } else if (using === "idiomorph") {
     path = "/src/idiomorph.js";
