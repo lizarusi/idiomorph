@@ -6,7 +6,7 @@ describe("Preserves focus algorithmically where possible", function () {
     after,
     focusId,
     selection,
-    shouldAssertFocusAndSelection = true,
+    focusedElementMoves = false,
   ) {
     getWorkArea().innerHTML = before;
     setFocusAndSelection(focusId, selection);
@@ -15,9 +15,9 @@ describe("Preserves focus algorithmically where possible", function () {
       restoreFocus: false,
     });
     getWorkArea().innerHTML.should.equal(after);
-    // for when we fall short of the ideal
-    // these should be considered TODOs for future improvement
-    if (shouldAssertFocusAndSelection) {
+    if (focusedElementMoves && !hasMoveBefore()) {
+      assertNoFocus(); // without moveBefore, reparenting blurs the element
+    } else {
       assertFocusAndSelection(focusId, selection);
     }
   }
@@ -89,16 +89,8 @@ describe("Preserves focus algorithmically where possible", function () {
       </div>`,
       "focused",
       "b",
-      false, // skip assertion
+      true, // the focused element itself is moved
     );
-    if (hasMoveBefore()) {
-      assertFocus("focused");
-      // TODO moveBefore loses selection on Chrome 133
-      // expect will be fixed in future release
-      // assertFocusAndSelection("focused", "b");
-    } else {
-      assertNoFocus();
-    }
   });
 
   it("preserves focus state when focused element is moved between anonymous containers", function () {
@@ -117,16 +109,8 @@ describe("Preserves focus algorithmically where possible", function () {
       </div>`,
       "focused",
       "b",
-      false, // skip assertion
+      true, // the focused element itself is moved
     );
-    if (hasMoveBefore()) {
-      assertFocus("focused");
-      // TODO moveBefore loses selection on Chrome 133
-      // expect will be fixed in future release
-      // assertFocusAndSelection("focused", "b");
-    } else {
-      assertNoFocus();
-    }
   });
 
   it("preserves focus state when elements are moved between IDed containers", function () {
@@ -151,16 +135,8 @@ describe("Preserves focus algorithmically where possible", function () {
       </div>`,
       "focused",
       "b",
-      false, // skip assertion
+      true, // the focused element itself is moved
     );
-    if (hasMoveBefore()) {
-      assertFocus("focused");
-      // TODO moveBefore loses selection on Chrome 133
-      // expect will be fixed in future release
-      // assertFocusAndSelection("focused", "b");
-    } else {
-      assertNoFocus();
-    }
   });
 
   it("preserves focus state when focus parent is moved down", function () {

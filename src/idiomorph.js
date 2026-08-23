@@ -593,7 +593,7 @@ var Idiomorph = (function () {
 
     /**
      * Moves an element before another element within the same parent.
-     * Uses the proposed `moveBefore` API if available (and working), otherwise falls back to `insertBefore`.
+     * Uses the `moveBefore` API if available (and working), otherwise falls back to `insertBefore`.
      * This is essentialy a forward-compat wrapper.
      *
      * @param {Element} parentNode - The parent node containing the after element.
@@ -608,7 +608,7 @@ var Idiomorph = (function () {
           // @ts-ignore - use proposed moveBefore feature
           parentNode.moveBefore(element, after);
         } catch (e) {
-          // fall back to insertBefore as some browsers may fail on moveBefore when trying to move Dom disconnected nodes to pantry
+          // moveBefore throws unless both nodes share a root, e.g. when morphing a detached subtree
           parentNode.insertBefore(element, after);
         }
       } else {
