@@ -627,6 +627,25 @@ describe("Core morphing tests", function () {
     initial.outerHTML.should.equal("<span>Bar</span>");
   });
 
+  it("preserves the svg namespace when recreating a node with persistent ids", function () {
+    let initial = make("<div><svg><circle id='c'/></svg></div>");
+    Idiomorph.morph(
+      initial,
+      "<div><section><svg><circle id='c'/></svg></section></div>",
+    );
+    initial
+      .querySelector("svg")
+      .namespaceURI.should.equal("http://www.w3.org/2000/svg");
+  });
+
+  it("does not uppercase html elements recreated with persistent ids", function () {
+    let initial = make("<div><p id='p'>Foo</p></div>");
+    Idiomorph.morph(initial, "<div><section><p id='p'>Foo</p></section></div>");
+    initial.outerHTML.should.equal(
+      '<div><section><p id="p">Foo</p></section></div>',
+    );
+  });
+
   describe("duplicate id warnings", function () {
     let warn;
 

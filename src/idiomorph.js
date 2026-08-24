@@ -368,8 +368,10 @@ var Idiomorph = (function () {
       if (ctx.callbacks.beforeNodeAdded(newChild) === false) return null;
       if (ctx.idMap.has(newChild)) {
         // node has children with ids with possible state so create a dummy elt of same type and apply full morph algorithm
-        const newEmptyChild = document.createElement(
-          /** @type {Element} */ (newChild).tagName,
+        // createElementNS doesn't case-normalize, so localName rather than tagName
+        const newEmptyChild = document.createElementNS(
+          /** @type {Element} */ (newChild).namespaceURI,
+          /** @type {Element} */ (newChild).localName,
         );
         oldParent.insertBefore(newEmptyChild, insertionPoint);
         morphNode(newEmptyChild, newChild, ctx);
