@@ -75,6 +75,12 @@
  */
 
 /**
+ * @typedef {Object} IdElement
+ * @property {Element} elt
+ * @property {string} id
+ */
+
+/**
  * @typedef {Object} IdSets
  * @property {Set<string>} persistentIds
  * @property {Map<Node, Set<string>>} idMap
@@ -1087,17 +1093,23 @@ var Idiomorph = (function () {
     }
 
     /**
-     * Returns all elements with an ID contained within the root element and its descendants
+     * Returns all elements with a non-empty ID contained within the root element and its
+     * descendants, each paired with its id so that it only has to be read once.
      *
      * @param {Element} root
-     * @returns {Element[]}
+     * @returns {IdElement[]}
      */
     function findIdElements(root) {
-      let elements = Array.from(root.querySelectorAll("[id]"));
-      // root could be a document fragment which doesn't have `getAttribute`
-      if (root.getAttribute?.("id")) {
-        elements.push(root);
+      /** @type {IdElement[]} */
+      let elements = [];
+      for (const elt of root.querySelectorAll("[id]")) {
+        // elt.id is unsafe because of form input shadowing, and `id=""` is not persistable
+        const id = elt.getAttribute("id");
+        if (id) elements.push({ elt, id });
       }
+      // root could be a document fragment which doesn't have `getAttribute`
+      const rootId = root.getAttribute?.("id");
+      if (rootId) elements.push({ elt: root, id: rootId });
       return elements;
     }
 
@@ -1110,12 +1122,10 @@ var Idiomorph = (function () {
      * @param {Map<Node, Set<string>>} idMap
      * @param {Set<string>} persistentIds
      * @param {Element} root
-     * @param {Element[]} elements
+     * @param {IdElement[]} elements
      */
     function populateIdMapWithTree(idMap, persistentIds, root, elements) {
-      for (const elt of elements) {
-        // we can pretend id is non-null String, because the .has line will reject it immediately if not
-        const id = /** @type {String} */ (elt.getAttribute("id"));
+      for (const { elt, id } of elements) {
         if (persistentIds.has(id)) {
           /** @type {Element|null} */
           let current = elt;
@@ -1167,8 +1177,8 @@ var Idiomorph = (function () {
     /**
      * This function computes the set of ids that persist between the two contents excluding duplicates
      *
-     * @param {Element[]} oldIdElements
-     * @param {Element[]} newIdElements
+     * @param {IdElement[]} oldIdElements
+     * @param {IdElement[]} newIdElements
      * @returns {Set<string>}
      */
     function createPersistentIds(oldIdElements, newIdElements) {
@@ -1176,11 +1186,7 @@ var Idiomorph = (function () {
 
       /** @type {Map<string, string>} */
       let oldIdTagNameMap = new Map();
-      for (const elt of oldIdElements) {
-        // elt.id is unsafe because of form input shadowing
-        const id = elt.getAttribute("id");
-        // elements with `id=""` are not persistable
-        if (!id) continue;
+      for (const { elt, id } of oldIdElements) {
         if (oldIdTagNameMap.has(id)) {
           duplicateIds.add(id);
         } else {
@@ -1189,9 +1195,7 @@ var Idiomorph = (function () {
       }
 
       let persistentIds = new Set();
-      for (const elt of newIdElements) {
-        const id = elt.getAttribute("id");
-        if (!id) continue;
+      for (const { elt, id } of newIdElements) {
         if (persistentIds.has(id)) {
           duplicateIds.add(id);
         } else if (oldIdTagNameMap.get(id) === elt.tagName) {
