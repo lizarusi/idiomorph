@@ -249,6 +249,25 @@ describe("Core morphing tests", function () {
     initial.documentElement.outerHTML.should.equal(finalSrc);
   });
 
+  it("can morph a full document with a doctype", function () {
+    let initial = parseHTML("<!DOCTYPE html><html><body>Foo</body></html>");
+    let finalSrc = "<html><head></head><body>Bar</body></html>";
+    Idiomorph.morph(initial, "<!DOCTYPE html>" + finalSrc);
+    initial.documentElement.outerHTML.should.equal(finalSrc);
+  });
+
+  it("can morph head and body content with a doctype", function () {
+    let initial = parseHTML("<!DOCTYPE html><html><body>Foo</body></html>");
+    Idiomorph.morph(
+      initial.documentElement,
+      "<!DOCTYPE html><body>Bar</body>",
+      {
+        morphStyle: "innerHTML",
+      },
+    );
+    initial.body.innerHTML.should.equal("Bar");
+  });
+
   it("ignores active input value when ignoreActiveValue is true", function () {
     let parent = make("<div><input value='foo'></div>");
     document.body.append(parent);

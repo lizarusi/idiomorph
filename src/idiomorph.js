@@ -1374,6 +1374,8 @@ var Idiomorph = (function () {
         contentWithSvgsRemoved.match(/<\/body>/)
       ) {
         let content = parser.parseFromString(newContent, "text/html");
+        // a doctype can neither be morphed nor inserted, and would displace the parent container below
+        content.doctype?.remove();
         // if it is a full HTML document, return the document itself as the parent container
         if (contentWithSvgsRemoved.match(/<\/html>/)) {
           generatedByIdiomorph.add(content);
