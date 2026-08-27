@@ -13,6 +13,7 @@
   * Fix TypeError when restoring focus to an element that doesn't support text selection (@emaia) #150
   * Skip the `beforeAttributeUpdated` callback when an attribute's value is unchanged (@monorkin) #149
   * Preserve the namespace of recreated elements, so SVG and MathML content containing persistent ids is no longer rebuilt as HTML (@guoliu, @botandrose) #154
+  * Fix focus restoration never running when `head: { block: true }` defers the morph (@botandrose)
 
 ## [0.7.4] - 2025-09-29
 

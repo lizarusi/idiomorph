@@ -164,24 +164,23 @@ var Idiomorph = (function () {
     const newNode = normalizeParent(newContent);
     const ctx = createMorphContext(oldNode, newNode, config);
 
-    const morphedNodes = saveAndRestoreFocus(ctx, () => {
-      return withHeadBlocking(
-        ctx,
-        oldNode,
-        newNode,
-        /** @param {MorphContext} ctx */ (ctx) => {
+    return withHeadBlocking(
+      ctx,
+      oldNode,
+      newNode,
+      /** @param {MorphContext} ctx */ (ctx) => {
+        const morphedNodes = saveAndRestoreFocus(ctx, () => {
           if (ctx.morphStyle === "innerHTML") {
             morphChildren(ctx, oldNode, newNode);
             return Array.from(oldNode.childNodes);
           } else {
             return morphOuterHTML(ctx, oldNode, newNode);
           }
-        },
-      );
-    });
-
-    ctx.pantry.remove();
-    return morphedNodes;
+        });
+        ctx.pantry.remove();
+        return morphedNodes;
+      },
+    );
   }
 
   /**
@@ -209,7 +208,7 @@ var Idiomorph = (function () {
   /**
    * @param {MorphContext} ctx
    * @param {Function} fn
-   * @returns {Promise<Node[]> | Node[]}
+   * @returns {Node[]}
    */
   function saveAndRestoreFocus(ctx, fn) {
     if (!ctx.config.restoreFocus) return fn();
