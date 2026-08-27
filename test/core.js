@@ -178,6 +178,20 @@ describe("Core morphing tests", function () {
     }).should.throw("Do not understand how to morph style magic");
   });
 
+  it("errors on bad head style", function () {
+    (() => {
+      Idiomorph.morph(make("<p>"), [], { head: { style: "magic" } });
+    }).should.throw("Do not understand how to morph head style magic");
+  });
+
+  it("treats a missing head style as the default", function () {
+    let initial = parseHTML("<html><head><title>Foo</title></head></html>");
+    Idiomorph.morph(initial, "<html><head><title>Bar</title></head></html>", {
+      head: { style: undefined },
+    });
+    initial.head.innerHTML.should.equal("<title>Bar</title>");
+  });
+
   it("can morph a template tag properly", function () {
     let initial = make("<template data-old>Foo</template>");
     let final = make("<template data-new>Bar</template>");

@@ -110,7 +110,7 @@ describe("Tests to ensure that the head tag merging works correctly", function (
     );
   });
 
-  it("ignore style ignores head", function () {
+  it("none style ignores head", function () {
     let parser = new DOMParser();
     let document = parser.parseFromString(
       "<html><head><title>Foo</title></head></html>",
@@ -120,7 +120,23 @@ describe("Tests to ensure that the head tag merging works correctly", function (
     Idiomorph.morph(
       document,
       "<html><head><meta name='foo' content='bar'></head></html>",
-      { head: { ignore: true } },
+      { head: { style: "none" } },
+    );
+
+    originalHead.outerHTML.should.equal("<head><title>Foo</title></head>");
+  });
+
+  it("none style ignores head even when blocking", function () {
+    let parser = new DOMParser();
+    let document = parser.parseFromString(
+      "<html><head><title>Foo</title></head></html>",
+      "text/html",
+    );
+    let originalHead = document.head;
+    Idiomorph.morph(
+      document,
+      "<html><head><meta name='foo' content='bar'></head></html>",
+      { head: { style: "none", block: true } },
     );
 
     originalHead.outerHTML.should.equal("<head><title>Foo</title></head>");

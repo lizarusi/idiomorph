@@ -5,6 +5,7 @@
 * Removed:
   * Remove AMD publish target since its EOL: https://github.com/requirejs/requirejs/issues/1816#issuecomment-707503323
   * Remove CommonJS publish target. `require("idiomorph")` no longer resolves; use `import "idiomorph"` instead. (@botandrose) #122
+  * Remove the undocumented `head.ignore` option in favour of `head: {style: 'none'}`, which the README has always documented (@botandrose)
 
 * Added:
   * Warn in the console when duplicate ids are detected during a morph, since they can cause subtle state loss (@botandrose) #142
@@ -14,6 +15,8 @@
   * Skip the `beforeAttributeUpdated` callback when an attribute's value is unchanged (@monorkin) #149
   * Preserve the namespace of recreated elements, so SVG and MathML content containing persistent ids is no longer rebuilt as HTML (@guoliu, @botandrose) #154
   * Fix focus restoration never running when `head: { block: true }` defers the morph (@botandrose)
+  * Fix `head: {style: 'none'}`, which had silently behaved as `merge` (@botandrose)
+  * Throw on an unrecognized `head.style`, rather than silently falling back to `merge` (@botandrose)
 
 ## [0.7.4] - 2025-09-29
 

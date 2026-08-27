@@ -3,7 +3,6 @@
  *
  * @property {'merge' | 'append' | 'morph' | 'none'} [style]
  * @property {boolean} [block]
- * @property {boolean} [ignore]
  * @property {function(Element): boolean} [shouldPreserve]
  * @property {function(Element): boolean} [shouldReAppend]
  * @property {function(Element): boolean} [shouldRemove]
@@ -44,7 +43,6 @@
  *
  * @property {'merge' | 'append' | 'morph' | 'none'} style
  * @property {boolean} [block]
- * @property {boolean} [ignore]
  * @property {(function(Element): boolean) | NoOp} shouldPreserve
  * @property {(function(Element): boolean) | NoOp} shouldReAppend
  * @property {(function(Element): boolean) | NoOp} shouldRemove
@@ -649,7 +647,7 @@ var Idiomorph = (function () {
         return oldNode;
       }
 
-      if (oldNode instanceof HTMLHeadElement && ctx.head.ignore) {
+      if (oldNode instanceof HTMLHeadElement && ctx.head.style === "none") {
         // ignore the head element
       } else if (
         oldNode instanceof HTMLHeadElement &&
@@ -879,7 +877,7 @@ var Idiomorph = (function () {
    * @returns {Node[] | Promise<Node[]>}
    */
   function withHeadBlocking(ctx, oldNode, newNode, callback) {
-    if (ctx.head.block) {
+    if (ctx.head.block && ctx.head.style !== "none") {
       const oldHead = oldNode.querySelector("head");
       const newHead = newNode.querySelector("head");
       if (oldHead && newHead) {
@@ -889,7 +887,7 @@ var Idiomorph = (function () {
           const newCtx = Object.assign(ctx, {
             head: {
               block: false,
-              ignore: true,
+              style: "none",
             },
           });
           return callback(newCtx);
@@ -1019,6 +1017,11 @@ var Idiomorph = (function () {
       const morphStyle = mergedConfig.morphStyle || "outerHTML";
       if (!["innerHTML", "outerHTML"].includes(morphStyle)) {
         throw `Do not understand how to morph style ${morphStyle}`;
+      }
+
+      const headStyle = mergedConfig.head.style || "merge";
+      if (!["merge", "append", "morph", "none"].includes(headStyle)) {
+        throw `Do not understand how to morph head style ${headStyle}`;
       }
 
       return {
